@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Легенды и мифы на небе</title>
+    <style>
+        /* Базовые стили (CSS) */
+        :root {
+            --bg-color: #050b18;
+            --card-bg: #1b2843;
+            --accent-color: #6096d4;
+            --text-color: #e0e6ed;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            padding: 50px 20px;
+            background: linear-gradient(to bottom, #000000, var(--bg-color));
+        }
+
+        h1 { margin: 0; font-size: 2.5rem; color: var(--accent-color); }
+        p.subtitle { opacity: 0.8; }
+
+        /* Фильтр */
+        .filter-buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 8px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+
+        button:hover, button.active {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        /* Сетка карточек */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            border-color: var(--accent-color);
+        }
+
+        .card h3 { color: var(--accent-color); margin-top: 0; }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Легенды и мифы на небе</h1>
+    <p class="subtitle">Интерактивный путеводитель по созвездиям</p>
+</header>
+
+<div class="filter-buttons">
+    <button onclick="filterCards('all')" class="active">Все</button>
+    <button onclick="filterCards('animal')">Животные</button>
+    <button onclick="filterCards('human')">Герои</button>
+</div>
+
+<div class="container" id="stars-container">
+    <!-- Карточки будут добавлены через JS -->
+</div>
+
+<!-- Модальное окно -->
+<div id="modal" class="modal" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="modal-title"></h2>
+        <p id="modal-text"></p>
+    </div>
+</div>
+
+<script>
+    /* Данные (JavaScript объект) */
+    const constellations = [
+        {
+            name: "Большая Медведица",
+            category: "animal",
+            short: "Самое известное созвездие северного неба.",
+            full: "В греческой мифологии это нимфа Каллисто, которую Зевс превратил в медведицу, чтобы спасти от гнева Геры. Позже он поместил её на небо."
+        },
+        {
+            name: "Орион",
+            category: "human",
+            short: "Великий охотник, видимый по всему миру.",
+            full: "Орион был сыном Посейдона. После его гибели от укуса скорпиона, боги поместили его на небо вместе с его псами (Большим и Малым Псом)."
+        },
+        {
+            name: "Кассиопея",
+            category: "human",
+            short: "Созвездие в форме буквы W.",
+            full: "Тщеславная царица, которая хвасталась своей красотой. В наказание боги заставили её вечно вращаться вокруг полюса, сидя на троне."
+        },
+        {
+            name: "Лев",
+            category: "animal",
+            short: "Яркое зодиакальное созвездие.",
+            full: "Считается, что это тот самый Немейский лев, которого победил Геракл во время своего первого подвига."
+        }
+    ];
+
+    const container = document.getElementById('stars-container');
+
+    // Функция создания карточек
+    function displayCards(data) {
+        container.innerHTML = '';
+        data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = () => openModal(item);
+            card.innerHTML = `
+                <h3>${item.name}</h3>
+                <p>${item.short}</p>
+                <small>Категория: ${item.category === 'animal' ? 'Животное' : 'Герой'}</small>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // Фильтрация
+    function filterCards(cat) {
+        // Обновляем кнопки
+        document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        if (cat === 'all') {
+            displayCards(constellations);
+        } else {
+            const filtered = constellations.filter(c => c.category === cat);
+            displayCards(filtered);
+        }
+    }
+
+    // Модальное окно
+    function openModal(item) {
+        document.getElementById('modal-title').innerText = item.name;
+        document.getElementById('modal-text').innerText = item.full;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    // Инициализация при загрузке
+    displayCards(constellations);
+</script>
+
+</body>
+</html>
