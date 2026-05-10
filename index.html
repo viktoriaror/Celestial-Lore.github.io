@@ -28,7 +28,7 @@
             background: linear-gradient(to bottom, #000000, var(--bg-color));
         }
 
-        h1 { margin: 0; font-size: 2.5rem; color: var(--accent-color); }
+        h1 { margin: 0; font-size: 4rem; color: var(--accent-color); }
         p.subtitle { opacity: 0.8; }
 
         /* Фильтр */
@@ -65,8 +65,8 @@
 
         .card {
             background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 13px;
+            padding: 25px;
             text-align: center;
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
@@ -104,7 +104,7 @@
         .close-btn {
             position: absolute;
             top: 15px; right: 20px;
-            font-size: 24px;
+            font-size: 26px;
             cursor: pointer;
         }
     </style>
@@ -188,7 +188,6 @@
             card.innerHTML = `
                 <h3>${item.name}</h3>
                 <p>${item.short}</p>
-                <!-- Строку с категорией ниже я удалил -->
             `;
             container.appendChild(card);
         });
@@ -221,6 +220,88 @@
 
     // Инициализация при загрузке
     displayCards(constellations);
+function createFlyingStars() {
+    const starCount = 60; // Количество звезд
+    
+    for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        
+        // Настраиваем стили напрямую через JS
+        Object.assign(star.style, {
+            position: 'fixed',
+            backgroundColor: 'white',
+            borderRadius: '50%',
+            pointerEvents: 'none',
+            zIndex: '-1', // Чтобы были за текстом
+            width: Math.random() * 3 + 'px',
+            height: Math.random() * 3 + 'px',
+            left: Math.random() * 100 + 'vw',
+            top: Math.random() * 100 + 'vh',
+            opacity: Math.random(),
+        });
+
+        document.body.appendChild(star);
+
+        // Создаем анимацию движения через JS
+        let speed = Math.random() * 1 + 0.1; // Скорость полета
+        let posY = parseFloat(star.style.top);
+
+        function move() {
+            posY -= speed; // Движение вверх
+            if (posY < -5) { // Если улетела за экран — возвращаем вниз
+                posY = 105;
+                star.style.left = Math.random() * 100 + 'vw';
+            }
+            star.style.top = posY + 'vh';
+            requestAnimationFrame(move);
+        }
+        move();
+    }
+}
+
+// Запускаем магию
+createFlyingStars();
+function enlargeButtons() {
+    // Находим все кнопки в блоке фильтров
+    const buttons = document.querySelectorAll('.filter-buttons button');
+    
+    buttons.forEach(btn => {
+        // Применяем увеличенные стили напрямую
+        Object.assign(btn.style, {
+            padding: '15px 25px',     // Делаем кнопки больше
+            fontSize: '1.2rem',       // Увеличиваем шрифт
+            margin: '10px',           // Добавляем отступы
+            borderWidth: '2px',       // Делаем рамку толще
+            fontWeight: 'bold',       // Жирный текст
+            textTransform: 'uppercase', // Все буквы заглавные (по желанию)
+            letterSpacing: '1px'      // Расстояние между буквами
+        });
+        // Поднимаем блок кнопок выше
+const filterContainer = document.querySelector('.filter-buttons');
+if (filterContainer) {
+    filterContainer.style.marginTop = '0px'; // Убираем верхний отступ у кнопок
+    filterContainer.style.marginBottom = '30px'; 
+}
+
+// Уменьшаем отступ у шапки (header), чтобы всё подтянулось вверх
+const header = document.querySelector('header');
+if (header) {
+    header.style.paddingBottom = '10px'; // Уменьшаем нижний отступ шапки
+}
+
+// Уменьшаем отступ у подзаголовка
+const subtitle = document.querySelector('.subtitle');
+if (subtitle) {
+    subtitle.style.marginBottom = '10px';
+}
+
+    });
+}
+
+// Запускаем увеличение
+enlargeButtons();
+
+
 </script>
 
 </body>
